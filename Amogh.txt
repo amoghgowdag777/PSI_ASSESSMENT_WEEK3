@@ -1,0 +1,95 @@
+create table Cinema (movie_id int, movie_name VARCHAR(30), yor int, rating float, dur int) row format delimited fields terminated by ',' ;
+
+load data local inpath '/home/amoghgowdag/Desktop/movies.txt' into table Cinema;
+
+select * from Cinema;
+
+Queries
+
+
+A) select count(movie_name) from Cinema where yor>=1950 and yor<=1960;
+ 
+B)select count(movie_name) from Cinema where rating>4;
+
+C)select count(movie_name) from Cinema where rating between 3 and 4; 
+
+D)select count(movie_name) from Cinema where duration >7200
+
+E)select yor,count(movie_name) from table group by year;
+
+F)select count(movies) from table;
+
+
+
+
+
+A.Find the number of movies released between 1950 and 1960.   
+
+Pig:
+
+A = LOAD '/home/amoghgowdag/Desktop/movies_dataset_for_pig.txt' using PigStorage (',') AS  (movie_id:int,movie_name:chararray,yor:int,rating:float,dur:int);
+B = FILTER A by yor >= 1950;
+C = FILTER B by yor <= 1960;
+mov_count1 = GROUP C All;
+count = FOREACH Mov_count1 GENERATE COUNT(C);
+DUMP count;
+STORE count INTO 'output1' ;
+
+
+B.Find the number of movies having rating more than 4.  
+
+Pig:
+
+A = LOAD '/home/amoghgowdag/Desktop/movies_dataset_for_pig.txt' using PigStorage (',') AS  (movie_id:int,movie_name:chararray,yor:int,rating:float,dur:int);
+B = FILTER A by rating > 4.0;
+mov_count2 = GROUP B All;
+Count2 = FOREACH Mov_count2 GENERATE COUNT(B);
+DUMP count2;
+STORE count INTO 'Output2' ;
+
+C.Find the movies whose rating are between 3 and 4.   
+
+Pig:
+
+A = LOAD '/home/amoghgowdag/Desktop/movies_dataset_for_pig.txt' using PigStorage (',') AS  (movie_id:int,movie_name:chararray,yor:int,rating:float,dur:int);
+B = FILTER A by rating >= 3.0;
+C = FILTER B by rating <= 4.0;
+mov_list = FOREACH C GENERATE movie_name;
+DUMP Mov_list;
+STORE Mov_list INTO 'Output3' ;
+
+
+D.Find the number of movies with duration more than 2 hours (7200 second).
+   
+Pig:
+
+A = LOAD '/home/amoghgowdag/Desktop/movies_dataset_for_pig.txt' using PigStorage (',') AS  (movie_id:int,movie_name:chararray,yor:int,rating:float,dur:int);
+B = FILTER A by dur > 7200;
+mov_count3 = GROUP B All;
+count3 = FOREACH Mov_count3 GENERATE COUNT(B);
+DUMP count3;
+STORE count3 INTO  ‘Output4' ;
+
+E.Find the list of years and number of movies released each year. 
+ 
+Pig:
+
+A = LOAD '/home/amoghgowdag/Desktop/movies_dataset_for_pig.txt' using PigStorage (',') AS  (movie_id:int,movie_name:chararray,yor:int,rating:float,dur:int);
+B=  FOREACH A  GENERATE yor;
+Yr_list = GROUP B by yor ;
+List = FOREACH Yr_list  GENERATE group, count(B) AS Num_Movies;
+DUMP List;
+STORE List INTO 'Output5' ;
+
+
+
+
+F.Find the total number of movies in the dataset. 
+  
+Pig:
+
+A = LOAD '/home/amoghgowdag/Desktop/movies_dataset_for_pig.txt' using PigStorage (',') AS  (movie_id:int,movie_name:chararray,yor:int,rating:float,dur:int);
+mov_count4 = GROUP A All;
+count4 = FOREACH Mov_count4 GENERATE COUNT(A);
+DUMP count4;
+STORE count4 INTO 'Output6' ;
